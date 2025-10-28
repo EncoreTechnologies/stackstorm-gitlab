@@ -1,0 +1,27 @@
+---
+
+name: issue.close
+description: "Close a GitLab issue"
+
+runner_type: python-script
+entry_point: issue_close.py
+
+parameters:
+  url:
+    type: string
+    description: Override the configured base url for gitlab
+  project:
+    type: string
+    required: true
+    description: the 'path_with_namespace' for the project (e.g., group/group/project)
+  issue_iid:
+    type: string
+    required: true
+    description: the iid of the issue in the project (not global unique id)
+  token:
+    type: string
+    description: Override the configured token for the gitlab api
+    secret: true
+  verify_ssl:
+    type: boolean
+    default: False

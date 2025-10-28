@@ -1,4 +1,8 @@
-## v1.0.1
+## v1.0.2
+
+* Added the rest of the integrations needed to completely manage gitlab issues.
+  
+* ## v1.0.1
 
 * Small bug fixes regarding Python 3 support
 
