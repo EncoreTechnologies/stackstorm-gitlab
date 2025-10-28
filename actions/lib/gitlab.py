@@ -38,7 +38,7 @@ class RequestsMethod(object):
         requests_method = methods.get(method)
         response = requests_method(
             url, headers=headers, params=params, json=json_data, verify=verify_ssl)
-            
+
         if response.status_code:
             return response.json()
 
