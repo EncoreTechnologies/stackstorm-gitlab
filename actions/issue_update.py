@@ -5,7 +5,8 @@ from lib.gitlab import GitlabIssuesAPI
 
 class GitlabIssueUpdate(GitlabIssuesAPI):
 
-    def run(self, url, project, issue_iid, title, description, assignee_ids, labels, token, verify_ssl):
+    def run(self, url, project, issue_iid, title, description,
+            assignee_ids, labels, token, verify_ssl):
         self.url = url or self.url
         self.verify_ssl = verify_ssl or self.verify_ssl
         self.token = token or self.token
@@ -15,7 +16,9 @@ class GitlabIssueUpdate(GitlabIssuesAPI):
         if assignee_ids is not None:
             if isinstance(assignee_ids, str):
                 if assignee_ids.strip():  # Only parse if not empty string
-                    parsed_assignee_ids = [int(aid.strip()) for aid in assignee_ids.split(',')]
+                    parsed_assignee_ids = [
+                        int(aid.strip()) for aid in assignee_ids.split(',')
+                    ]
                 else:
                     parsed_assignee_ids = []  # Empty list clears assignees
             elif isinstance(assignee_ids, list):
@@ -26,7 +29,9 @@ class GitlabIssueUpdate(GitlabIssuesAPI):
         if labels is not None:
             if isinstance(labels, str):
                 if labels.strip():  # Only parse if not empty string
-                    parsed_labels = [label.strip() for label in labels.split(',')]
+                    parsed_labels = [
+                        label.strip() for label in labels.split(',')
+                    ]
                 else:
                     parsed_labels = []  # Empty list clears labels
             elif isinstance(labels, list):

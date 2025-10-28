@@ -124,9 +124,11 @@ class GitlabIssuesAPI(GitlabRestClient):
             params['state'] = state
             kwargs['params'] = params
 
-        return self._get(url, real_endpoint, token=self.token, headers=self._headers, **kwargs)
+        return self._get(url, real_endpoint, token=self.token,
+                         headers=self._headers, **kwargs)
 
-    def create(self, url, endpoint, title, description=None, assignee_ids=None, labels=None, **kwargs):
+    def create(self, url, endpoint, title, description=None,
+               assignee_ids=None, labels=None, **kwargs):
         """Create a new issue.
 
         Args:
@@ -152,7 +154,8 @@ class GitlabIssuesAPI(GitlabRestClient):
         # Merge any additional parameters
         json_data.update(kwargs)
 
-        return self._post(url, real_endpoint, token=self.token, headers=self._headers, json_data=json_data)
+        return self._post(url, real_endpoint, token=self.token,
+                          headers=self._headers, json_data=json_data)
 
     def update(self, url, endpoint, issue_iid, title=None, description=None,
                assignee_ids=None, labels=None, state_event=None, **kwargs):
@@ -187,7 +190,8 @@ class GitlabIssuesAPI(GitlabRestClient):
         # Merge any additional parameters
         json_data.update(kwargs)
 
-        return self._put(url, real_endpoint, token=self.token, headers=self._headers, json_data=json_data)
+        return self._put(url, real_endpoint, token=self.token,
+                         headers=self._headers, json_data=json_data)
 
     def close(self, url, endpoint, issue_iid, **kwargs):
         """Close an issue.
@@ -246,7 +250,8 @@ class GitlabIssuesAPI(GitlabRestClient):
         json_data = {'body': body}
         json_data.update(kwargs)
 
-        return self._post(url, real_endpoint, token=self.token, headers=self._headers, json_data=json_data)
+        return self._post(url, real_endpoint, token=self.token,
+                          headers=self._headers, json_data=json_data)
 
 
 class GitlabPipelineAPI(GitlabRestClient):

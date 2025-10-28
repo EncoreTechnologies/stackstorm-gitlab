@@ -14,7 +14,9 @@ class GitlabIssueCreate(GitlabIssuesAPI):
         parsed_assignee_ids = None
         if assignee_ids:
             if isinstance(assignee_ids, str):
-                parsed_assignee_ids = [int(aid.strip()) for aid in assignee_ids.split(',')]
+                parsed_assignee_ids = [
+                    int(aid.strip()) for aid in assignee_ids.split(',')
+                ]
             elif isinstance(assignee_ids, list):
                 parsed_assignee_ids = [int(aid) for aid in assignee_ids]
 
@@ -22,7 +24,9 @@ class GitlabIssueCreate(GitlabIssuesAPI):
         parsed_labels = None
         if labels:
             if isinstance(labels, str):
-                parsed_labels = [label.strip() for label in labels.split(',')]
+                parsed_labels = [
+                    label.strip() for label in labels.split(',')
+                ]
             elif isinstance(labels, list):
                 parsed_labels = labels
 
