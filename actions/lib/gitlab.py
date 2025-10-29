@@ -95,15 +95,6 @@ class GitlabProjectsAPI(GitlabRestClient):
         return self._get(url, real_endpoint, token=self.token, headers=self._headers, **kwargs)
 
     def get_file(self, url, project, file_path, ref='main', **kwargs):
-        """Get a file from a project repository.
-
-        Args:
-            url: GitLab instance URL
-            project: Project path (e.g., 'group/project')
-            file_path: Path to file in repository
-            ref: Branch, tag, or commit SHA (default: 'main')
-            **kwargs: Additional query parameters
-        """
         real_endpoint = "{0}/{1}/repository/files/{2}".format(
             self._api_endpoint, quote_plus(project),
             quote_plus(file_path))
@@ -129,14 +120,6 @@ class GitlabIssuesAPI(GitlabRestClient):
         return self._get(url, real_endpoint, token=self.token, headers=self._headers, **kwargs)
 
     def list(self, url, endpoint, state=None, **kwargs):
-        """List all issues for a project.
-
-        Args:
-            url: GitLab instance URL
-            endpoint: Project path (e.g., 'group/project')
-            state: Filter by state ('opened', 'closed', 'all'). Default is 'all'.
-            **kwargs: Additional query parameters
-        """
         real_endpoint = "{0}/{1}/{2}".format(
             self._api_endpoint, quote_plus(endpoint), self._api_sub_endpoint)
 
@@ -150,17 +133,6 @@ class GitlabIssuesAPI(GitlabRestClient):
 
     def create(self, url, endpoint, title, description=None,
                assignee_ids=None, labels=None, **kwargs):
-        """Create a new issue.
-
-        Args:
-            url: GitLab instance URL
-            endpoint: Project path (e.g., 'group/project')
-            title: Issue title (required)
-            description: Issue description
-            assignee_ids: List of user IDs to assign
-            labels: List of label names
-            **kwargs: Additional issue parameters
-        """
         real_endpoint = "{0}/{1}/{2}".format(
             self._api_endpoint, quote_plus(endpoint), self._api_sub_endpoint)
 
@@ -172,7 +144,6 @@ class GitlabIssuesAPI(GitlabRestClient):
         if labels:
             json_data['labels'] = ','.join(labels) if isinstance(labels, list) else labels
 
-        # Merge any additional parameters
         json_data.update(kwargs)
 
         return self._post(url, real_endpoint, token=self.token,
@@ -180,26 +151,13 @@ class GitlabIssuesAPI(GitlabRestClient):
 
     def update(self, url, endpoint, issue_iid, title=None, description=None,
                assignee_ids=None, labels=None, state_event=None, **kwargs):
-        """Update an existing issue.
-
-        Args:
-            url: GitLab instance URL
-            endpoint: Project path (e.g., 'group/project')
-            issue_iid: Issue IID (project-specific ID)
-            title: New title
-            description: New description
-            assignee_ids: List of user IDs to assign
-            labels: List of label names
-            state_event: State action ('close' or 'reopen')
-            **kwargs: Additional issue parameters
-        """
         real_endpoint = "{0}/{1}/{2}/{3}".format(
             self._api_endpoint, quote_plus(endpoint), self._api_sub_endpoint, issue_iid)
 
         json_data = {}
         if title:
             json_data['title'] = title
-        if description is not None:  # Allow empty string to clear description
+        if description is not None:
             json_data['description'] = description
         if assignee_ids is not None:
             json_data['assignee_ids'] = assignee_ids
@@ -208,33 +166,15 @@ class GitlabIssuesAPI(GitlabRestClient):
         if state_event:
             json_data['state_event'] = state_event
 
-        # Merge any additional parameters
         json_data.update(kwargs)
 
         return self._put(url, real_endpoint, token=self.token,
                          headers=self._headers, json_data=json_data)
 
     def close(self, url, endpoint, issue_iid, **kwargs):
-        """Close an issue.
-
-        Args:
-            url: GitLab instance URL
-            endpoint: Project path (e.g., 'group/project')
-            issue_iid: Issue IID (project-specific ID)
-            **kwargs: Additional parameters (e.g., description update)
-        """
         return self.update(url, endpoint, issue_iid, state_event='close', **kwargs)
 
     def reopen(self, url, endpoint, issue_iid, description=None, **kwargs):
-        """Reopen a closed issue.
-
-        Args:
-            url: GitLab instance URL
-            endpoint: Project path (e.g., 'group/project')
-            issue_iid: Issue IID (project-specific ID)
-            description: Optional description update
-            **kwargs: Additional parameters
-        """
         update_kwargs = {'state_event': 'reopen'}
         if description is not None:
             update_kwargs['description'] = description
@@ -243,28 +183,11 @@ class GitlabIssuesAPI(GitlabRestClient):
         return self.update(url, endpoint, issue_iid, **update_kwargs)
 
     def list_notes(self, url, endpoint, issue_iid, **kwargs):
-        """List all notes (comments) on an issue.
-
-        Args:
-            url: GitLab instance URL
-            endpoint: Project path (e.g., 'group/project')
-            issue_iid: Issue IID (project-specific ID)
-            **kwargs: Additional query parameters
-        """
         real_endpoint = "{0}/{1}/{2}/{3}/notes".format(
             self._api_endpoint, quote_plus(endpoint), self._api_sub_endpoint, issue_iid)
         return self._get(url, real_endpoint, token=self.token, headers=self._headers, **kwargs)
 
     def create_note(self, url, endpoint, issue_iid, body, **kwargs):
-        """Add a note (comment) to an issue.
-
-        Args:
-            url: GitLab instance URL
-            endpoint: Project path (e.g., 'group/project')
-            issue_iid: Issue IID (project-specific ID)
-            body: The content of the note
-            **kwargs: Additional note parameters
-        """
         real_endpoint = "{0}/{1}/{2}/{3}/notes".format(
             self._api_endpoint, quote_plus(endpoint), self._api_sub_endpoint, issue_iid)
 
