@@ -94,6 +94,27 @@ class GitlabProjectsAPI(GitlabRestClient):
                                          quote_plus(endpoint))
         return self._get(url, real_endpoint, token=self.token, headers=self._headers, **kwargs)
 
+    def get_file(self, url, project, file_path, ref='main', **kwargs):
+        """Get a file from a project repository.
+
+        Args:
+            url: GitLab instance URL
+            project: Project path (e.g., 'group/project')
+            file_path: Path to file in repository
+            ref: Branch, tag, or commit SHA (default: 'main')
+            **kwargs: Additional query parameters
+        """
+        real_endpoint = "{0}/{1}/repository/files/{2}".format(
+            self._api_endpoint, quote_plus(project),
+            quote_plus(file_path))
+
+        params = kwargs.get('params', {})
+        params['ref'] = ref
+        kwargs['params'] = params
+
+        return self._get(url, real_endpoint, token=self.token,
+                         headers=self._headers, **kwargs)
+
 
 class GitlabIssuesAPI(GitlabRestClient):
 
