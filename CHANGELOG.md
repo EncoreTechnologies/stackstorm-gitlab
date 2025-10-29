@@ -1,4 +1,9 @@
-## v1.0.1
+## v1.0.2
+
+* Added the rest of the integrations needed to completely manage gitlab issues.
+* Added ability to get a file from a project.
+  
+* ## v1.0.1
 
 * Small bug fixes regarding Python 3 support
 

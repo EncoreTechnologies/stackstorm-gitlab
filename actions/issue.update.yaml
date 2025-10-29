@@ -1,0 +1,39 @@
+---
+
+name: issue.update
+description: "Update an existing GitLab issue"
+
+runner_type: python-script
+entry_point: issue_update.py
+
+parameters:
+  url:
+    type: string
+    description: Override the configured base url for gitlab
+  project:
+    type: string
+    required: true
+    description: the 'path_with_namespace' for the project (e.g., group/group/project)
+  issue_iid:
+    type: string
+    required: true
+    description: the iid of the issue in the project (not global unique id)
+  title:
+    type: string
+    description: The new issue title
+  description:
+    type: string
+    description: The new issue description
+  assignee_ids:
+    type: string
+    description: Comma-separated list of user IDs to assign the issue to (empty string to clear)
+  labels:
+    type: string
+    description: Comma-separated list of label names (empty string to clear)
+  token:
+    type: string
+    description: Override the configured token for the gitlab api
+    secret: true
+  verify_ssl:
+    type: boolean
+    default: False

@@ -27,16 +27,17 @@ def override_token(func):
 class RequestsMethod(object):
 
     @staticmethod
-    def method(method, url, verify_ssl=False, headers=None, params=None):
+    def method(method, url, verify_ssl=False, headers=None, params=None, json_data=None):
         methods = {'get': requests.get,
-                   'post': requests.post}
+                   'post': requests.post,
+                   'put': requests.put}
 
         if not params:
             params = dict()
 
         requests_method = methods.get(method)
         response = requests_method(
-            url, headers=headers, params=params, verify=verify_ssl)
+            url, headers=headers, params=params, json=json_data, verify=verify_ssl)
 
         if response.status_code:
             return response.json()
@@ -63,15 +64,23 @@ class GitlabRestClient(Action):
         return RequestsMethod.method('get', api_url, self.verify_ssl, headers, params)
 
     @override_token
-    def _post(self, url, endpoint, headers, params=None, *args, **kwargs):
+    def _post(self, url, endpoint, headers, params=None, json_data=None, *args, **kwargs):
         api_url = '/'.join((url, self._api_ext, endpoint))
-        return RequestsMethod.method('post', api_url, self.verify_ssl, headers, params)
+        return RequestsMethod.method('post', api_url, self.verify_ssl, headers, params, json_data)
+
+    @override_token
+    def _put(self, url, endpoint, headers, params=None, json_data=None, *args, **kwargs):
+        api_url = '/'.join((url, self._api_ext, endpoint))
+        return RequestsMethod.method('put', api_url, self.verify_ssl, headers, params, json_data)
 
     def get(self, *args, **kwargs):
         return self._get(*args, **kwargs)
 
     def post(self, *args, **kwargs):
         return self._post(*args, **kwargs)
+
+    def put(self, *args, **kwargs):
+        return self._put(*args, **kwargs)
 
 
 class GitlabProjectsAPI(GitlabRestClient):
@@ -85,6 +94,18 @@ class GitlabProjectsAPI(GitlabRestClient):
                                          quote_plus(endpoint))
         return self._get(url, real_endpoint, token=self.token, headers=self._headers, **kwargs)
 
+    def get_file(self, url, project, file_path, ref='main', **kwargs):
+        real_endpoint = "{0}/{1}/repository/files/{2}".format(
+            self._api_endpoint, quote_plus(project),
+            quote_plus(file_path))
+
+        params = kwargs.get('params', {})
+        params['ref'] = ref
+        kwargs['params'] = params
+
+        return self._get(url, real_endpoint, token=self.token,
+                         headers=self._headers, **kwargs)
+
 
 class GitlabIssuesAPI(GitlabRestClient):
 
@@ -97,6 +118,84 @@ class GitlabIssuesAPI(GitlabRestClient):
         real_endpoint = "{0}/{1}/{2}/{3}".format(
             self._api_endpoint, quote_plus(endpoint), self._api_sub_endpoint, issue_id)
         return self._get(url, real_endpoint, token=self.token, headers=self._headers, **kwargs)
+
+    def list(self, url, endpoint, state=None, **kwargs):
+        real_endpoint = "{0}/{1}/{2}".format(
+            self._api_endpoint, quote_plus(endpoint), self._api_sub_endpoint)
+
+        params = kwargs.get('params', {})
+        if state:
+            params['state'] = state
+            kwargs['params'] = params
+
+        return self._get(url, real_endpoint, token=self.token,
+                         headers=self._headers, **kwargs)
+
+    def create(self, url, endpoint, title, description=None,
+               assignee_ids=None, labels=None, **kwargs):
+        real_endpoint = "{0}/{1}/{2}".format(
+            self._api_endpoint, quote_plus(endpoint), self._api_sub_endpoint)
+
+        json_data = {'title': title}
+        if description:
+            json_data['description'] = description
+        if assignee_ids:
+            json_data['assignee_ids'] = assignee_ids
+        if labels:
+            json_data['labels'] = ','.join(labels) if isinstance(labels, list) else labels
+
+        json_data.update(kwargs)
+
+        return self._post(url, real_endpoint, token=self.token,
+                          headers=self._headers, json_data=json_data)
+
+    def update(self, url, endpoint, issue_iid, title=None, description=None,
+               assignee_ids=None, labels=None, state_event=None, **kwargs):
+        real_endpoint = "{0}/{1}/{2}/{3}".format(
+            self._api_endpoint, quote_plus(endpoint), self._api_sub_endpoint, issue_iid)
+
+        json_data = {}
+        if title:
+            json_data['title'] = title
+        if description is not None:
+            json_data['description'] = description
+        if assignee_ids is not None:
+            json_data['assignee_ids'] = assignee_ids
+        if labels is not None:
+            json_data['labels'] = ','.join(labels) if isinstance(labels, list) else labels
+        if state_event:
+            json_data['state_event'] = state_event
+
+        json_data.update(kwargs)
+
+        return self._put(url, real_endpoint, token=self.token,
+                         headers=self._headers, json_data=json_data)
+
+    def close(self, url, endpoint, issue_iid, **kwargs):
+        return self.update(url, endpoint, issue_iid, state_event='close', **kwargs)
+
+    def reopen(self, url, endpoint, issue_iid, description=None, **kwargs):
+        update_kwargs = {'state_event': 'reopen'}
+        if description is not None:
+            update_kwargs['description'] = description
+        update_kwargs.update(kwargs)
+
+        return self.update(url, endpoint, issue_iid, **update_kwargs)
+
+    def list_notes(self, url, endpoint, issue_iid, **kwargs):
+        real_endpoint = "{0}/{1}/{2}/{3}/notes".format(
+            self._api_endpoint, quote_plus(endpoint), self._api_sub_endpoint, issue_iid)
+        return self._get(url, real_endpoint, token=self.token, headers=self._headers, **kwargs)
+
+    def create_note(self, url, endpoint, issue_iid, body, **kwargs):
+        real_endpoint = "{0}/{1}/{2}/{3}/notes".format(
+            self._api_endpoint, quote_plus(endpoint), self._api_sub_endpoint, issue_iid)
+
+        json_data = {'body': body}
+        json_data.update(kwargs)
+
+        return self._post(url, real_endpoint, token=self.token,
+                          headers=self._headers, json_data=json_data)
 
 
 class GitlabPipelineAPI(GitlabRestClient):

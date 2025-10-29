@@ -1,0 +1,31 @@
+---
+
+name: issue.list
+description: "List all issues for a project with filtering by state"
+
+runner_type: python-script
+entry_point: issue_list.py
+
+parameters:
+  url:
+    type: string
+    description: Override the configured base url for gitlab
+  project:
+    type: string
+    required: true
+    description: the 'path_with_namespace' for the project (e.g., group/group/project)
+  state:
+    type: string
+    description: Filter issues by state
+    enum:
+      - opened
+      - closed
+      - all
+    default: all
+  token:
+    type: string
+    description: Override the configured token for the gitlab api
+    secret: true
+  verify_ssl:
+    type: boolean
+    default: False

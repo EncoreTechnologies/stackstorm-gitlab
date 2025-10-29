@@ -1,0 +1,36 @@
+---
+
+name: issue.create
+description: "Create a new GitLab issue"
+
+runner_type: python-script
+entry_point: issue_create.py
+
+parameters:
+  url:
+    type: string
+    description: Override the configured base url for gitlab
+  project:
+    type: string
+    required: true
+    description: the 'path_with_namespace' for the project (e.g., group/group/project)
+  title:
+    type: string
+    required: true
+    description: The issue title
+  description:
+    type: string
+    description: The issue description
+  assignee_ids:
+    type: string
+    description: Comma-separated list of user IDs to assign the issue to
+  labels:
+    type: string
+    description: Comma-separated list of label names
+  token:
+    type: string
+    description: Override the configured token for the gitlab api
+    secret: true
+  verify_ssl:
+    type: boolean
+    default: False

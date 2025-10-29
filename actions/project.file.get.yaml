@@ -1,0 +1,35 @@
+---
+
+name: project.file.get
+description: "Get a file/template from a GitLab project repository"
+
+runner_type: python-script
+entry_point: project_file_get.py
+
+parameters:
+  url:
+    type: string
+    description: Override the configured base url for gitlab
+  project:
+    type: string
+    required: true
+    description: the 'path_with_namespace' for the project (e.g., group/project)
+  file_path:
+    type: string
+    required: true
+    description: Path to file in repository (e.g., '.gitlab/issue_templates/bug.md')
+  ref:
+    type: string
+    description: Branch, tag, or commit SHA to get file from
+    default: main
+  decode_content:
+    type: boolean
+    description: Decode base64 content and include in response
+    default: true
+  token:
+    type: string
+    description: Override the configured token for the gitlab api
+    secret: true
+  verify_ssl:
+    type: boolean
+    default: False
